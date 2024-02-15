@@ -1,7 +1,7 @@
 import fs from "fs";
 import readline from "readline";
 
-function cccat(source) {
+function cccat(source, currentLineNumber) {
   try {
     if (source === '-') {
       // Read from standard input
@@ -11,18 +11,37 @@ function cccat(source) {
         terminal: false
       });
 
-      r1.on("line", (line) => {
-        console.log(line);
-      });
+      if (currentLineNumber === 0) {
+        r1.on("line", (line) => {
+          console.log(line);
+        });
+      } else {
+        r1.on("line", (line) => {
+          console.log(`${currentLineNumber}. ${line}`);
+          currentLineNumber = currentLineNumber + 1;
+        })
+      }
 
       r1.on("close", () => {
         process.exit(0);
       });
     } else {
       // Read from file 
-      const content = fs.readFileSync(source, 'utf-8');
-      if (content) {
-        console.log(content);
+      if (currentLineNumber === 0) {
+        const content = fs.readFileSync(source, 'utf-8').split('\n');
+        content.forEach(line => {
+          if (line) {
+            console.log(line);
+          }
+        })
+      } else {
+        const content = fs.readFileSync(source, 'utf-8').split('\n');
+        content.forEach((line) => {
+          if (line) {
+            console.log(`${currentLineNumber} ${line}`);
+            currentLineNumber = currentLineNumber + 1;
+          }
+        })
       }
     }
   } catch (err) {
@@ -30,12 +49,26 @@ function cccat(source) {
   }
 }
 
-function cccatMultipleFiles(files) {
+function cccatMultipleFiles(files, currentLineNumber) {
   try {
     for (let file of files) {
-      const content = fs.readFileSync(file, 'utf-8');
-      if (content) {
-        console.log(content);
+      if (file === "-n") continue;
+
+      if (currentLineNumber === 0) {
+        const content = fs.readFileSync(file, 'utf-8').split('\n');
+        content.forEach(line => {
+          if (line) {
+            console.log(line);
+          }
+        })
+      } else {
+        const content = fs.readFileSync(file, 'utf-8').split('\n');
+        content.forEach(line => {
+          if (line) {
+            console.log(`${currentLineNumber} ${line}`);
+            currentLineNumber = currentLineNumber + 1;
+          }
+        })
       }
     }
   } catch (err) {
@@ -49,9 +82,18 @@ if (process.argv.length < 3) {
 }
 
 const source = process.argv.slice(2);
-console.log(source);
-if (source.length === 1) {
-  cccat(source[0]);
+
+if (source[source.length - 1] === "-n") {
+  if (source.length === 1) {
+    cccat("-", 1);
+  } else if (source.length === 2) {
+    cccat(source[0], 1);
+  } else {
+    cccatMultipleFiles(source, 1);
+  }
+}
+else if (source.length === 1) {
+  cccat(source[0], 0);
 } else {
-  cccatMultipleFiles(source);
+  cccatMultipleFiles(source, 0);
 }
