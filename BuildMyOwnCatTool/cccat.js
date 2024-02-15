@@ -21,17 +21,37 @@ function cccat(source) {
     } else {
       // Read from file 
       const content = fs.readFileSync(source, 'utf-8');
-      console.log(content);
+      if (content) {
+        console.log(content);
+      }
     }
   } catch (err) {
     console.error(`Error: ${err.message}`);
   }
 }
 
-if (process.argv.length !== 3) {
-  console.error(`Usage: node cccat.js <file_path>`);
+function cccatMultipleFiles(files) {
+  try {
+    for (let file of files) {
+      const content = fs.readFileSync(file, 'utf-8');
+      if (content) {
+        console.log(content);
+      }
+    }
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+  }
+}
+
+if (process.argv.length < 3) {
+  console.error(`Usage: node cccat.js <file_path1> <file_path2>`);
   process.exit(1);
 }
 
-const source = process.argv[2];
-cccat(source);
+const source = process.argv.slice(2);
+console.log(source);
+if (source.length === 1) {
+  cccat(source[0]);
+} else {
+  cccatMultipleFiles(source);
+}
