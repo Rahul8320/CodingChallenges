@@ -17,4 +17,3 @@ Examples:
  node cccat file   Output file's contents
 ```
 
-
