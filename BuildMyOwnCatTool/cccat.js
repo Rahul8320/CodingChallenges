@@ -1,6 +1,8 @@
 import fs from "fs";
 import readline from "readline";
 
+const VERSION = 1.10;
+
 function cccat(source, currentLineNumber) {
   try {
     if (source === '-') {
@@ -77,13 +79,40 @@ function cccatMultipleFiles(files, currentLineNumber) {
 }
 
 if (process.argv.length < 3) {
-  console.error(`Usage: node cccat.js <file_path1> <file_path2>`);
+  console.error(`Usage: node cccat.js <file_paths> <options>`);
   process.exit(1);
+}
+
+function printVersion() {
+  console.log(`cccat (cat clone) ${VERSION}`);
+  console.log();
+  console.log(`Written by Rahul Dey`);
+}
+
+function printHelp() {
+  console.log("Usage: node cccat [FILE]...[OPTION]")
+  console.log("Concatenate FILE(s) to standard output. [Clone of cat command from linux]");
+  console.log();
+  console.log("When FILE is -, read standard input.");
+  console.log();
+  console.log("-n          number all output lines");
+  console.log("--version   output version information and exit");
+  console.log("--help      display this help and exit");
+  console.log();
+  console.log("Examples:")
+  console.log(" node cccat        Copy standard input to standard output.");
+  console.log(" node cccat file   Output file's contents");
 }
 
 const source = process.argv.slice(2);
 
-if (source[source.length - 1] === "-n") {
+if (source[source.length - 1] === "--help" || source[0] === "--help") {
+  printHelp();
+}
+else if (source[source.length - 1] === "--version" || source[0] === "--version") {
+  printVersion();
+}
+else if (source[source.length - 1] === "-n") {
   if (source.length === 1) {
     cccat("-", 1);
   } else if (source.length === 2) {
