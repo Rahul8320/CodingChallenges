@@ -1,9 +1,28 @@
 import fs from "fs";
+import readline from "readline";
 
-function cccat(filePath) {
+function cccat(source) {
   try {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    console.log(content);
+    if (source === '-') {
+      // Read from standard input
+      const r1 = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        terminal: false
+      });
+
+      r1.on("line", (line) => {
+        console.log(line);
+      });
+
+      r1.on("close", () => {
+        process.exit(0);
+      });
+    } else {
+      // Read from file 
+      const content = fs.readFileSync(source, 'utf-8');
+      console.log(content);
+    }
   } catch (err) {
     console.error(`Error: ${err.message}`);
   }
@@ -14,5 +33,5 @@ if (process.argv.length !== 3) {
   process.exit(1);
 }
 
-const filePath = process.argv[2];
-cccat(filePath);
+const source = process.argv[2];
+cccat(source);
